@@ -15,6 +15,6 @@ public class FotoProducto {
     private Long id;
     private String nombre;
 
-    @ManyToOne(targetEntity = Anuncio.class)
-    private Anuncio anuncio;
+    @ManyToOne(targetEntity = Producto.class)
+    private Producto producto;
 }

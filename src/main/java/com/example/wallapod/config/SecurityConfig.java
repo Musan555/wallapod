@@ -13,6 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration      //Especifica que es una clase de configuración
 @EnableWebSecurity  //Especificamos con esta clase vamos a configurar la seguridad de la App
 public class SecurityConfig {
+
+
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
