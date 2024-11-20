@@ -30,11 +30,13 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
-		<!-- Seguridad -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+		<!-- Seguridad (comentado para deshabilitar la funcionalidad de login y autenticación) -->
+		<!--
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        -->
 
 		<!-- Thymeleaf -->
 		<dependency>
@@ -97,6 +99,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 
 	<build>
 		<plugins>

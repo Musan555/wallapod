@@ -1,69 +1,155 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title th:text="${titulo}">Wallapod</title>
+    <style>
+        /* Estilos básicos para el diseño */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .login-container a {
+            color: white;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .actions a {
+            margin-right: 10px;
+            text-decoration: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+
 <!-- Navbar -->
 <nav>
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f0f0f0; border-bottom: 1px solid #ccc;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <a href="/" style="margin-right: 20px; text-decoration: none; font-weight: bold;">Wallapod</a>
-            <a href="/categorias" style="text-decoration: none;">Categorías</a>
+            <a href="/" style="font-size: 24px;">Wallapod</a>
+            <a href="/categorias">Categorías</a>
         </div>
-        <div>
-            <!-- Login/logout -->
-            <!--
+        <div class="login-container">
+            <!-- Mostrar opciones de login/logout basadas en autenticación -->
             <th:block sec:authorize="isAnonymous()">
-                <form th:action="@{/login}" method="post" style="display: inline;">
-                    <input type="text" name="username" placeholder="Username" />
-                    <input type="password" name="password" placeholder="Password" />
-                    <input type="submit" value="Log in" />
-                </form>
+                <a href="/login">Iniciar sesión</a>
             </th:block>
             <th:block sec:authorize="isAuthenticated()">
-                <div style="display: inline;">
-                    Bienvenido <span sec:authentication="name"></span>
-                    <a href="#" id="logoutEnlace" onclick="document.getElementById('formLogOut').submit()">Cerrar Sesión</a>
-                    <form th:action="@{/logout}" method="post" id="formLogOut"></form>
-                </div>
+                <span>Bienvenido, <span sec:authentication="name"></span></span>
+                <a href="#" id="logoutEnlace" onclick="document.getElementById('formLogOut').submit()">Cerrar sesión</a>
+                <form th:action="@{/logout}" method="post" id="formLogOut"></form>
             </th:block>
-            -->
         </div>
     </div>
 </nav>
 
 <!-- Main Content -->
-<main style="padding: 20px;">
+<div class="main-content">
     <h2>Catálogo de Productos</h2>
-    <table border="1" cellspacing="0" cellpadding="10" style="width: 100%; text-align: left;">
+
+    <table>
         <thead>
         <tr>
-            <th>Nombre</th>
+            <th>Foto</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Precio</th>
             <th>Categoría</th>
             <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="producto : ${productos}">
-            <td th:text="${producto.titulo}">Nombre del producto</td>
-            <td th:text="${producto.categoria?.nombre ?: 'Sin Categoría'}">Categoría</td>
             <td>
+                <!-- Verifica si hay fotos antes de intentar acceder a la primera -->
+                <img th:if="${not #lists.isEmpty(producto.fotos)}" th:src="@{${producto.fotos.get(0).url}}" alt="Imagen del producto" style="width: 100px; height: auto;">
+                <!-- Si no hay fotos, puedes mostrar una imagen por defecto o un texto -->
+                <img th:unless="${not #lists.isEmpty(producto.fotos)}" src="@{/images/no-image.jpg}" alt="Imagen por defecto" style="width: 100px; height: auto;">
+            </td>
+            <td th:text="${producto.titulo}">Título del producto</td>
+            <td th:text="${producto.descripcion}">Descripción del producto</td>
+            <td th:text="${producto.precio}">Precio</td>
+            <td th:text="${producto.categoria?.nombre ?: 'Sin Categoría'}">Categoría</td>
+            <td class="actions">
+                <a th:href="@{/productos/view/{id}(id=${producto.id})}">Ver</a>
                 <a th:href="@{/productos/edit/{id}(id=${producto.id})}">Editar</a>
                 <a th:href="@{/productos/del/{id}(id=${producto.id})}" style="color: red;">Borrar</a>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(productos)}">
-            <td colspan="3" style="text-align: center;">No hay productos disponibles</td>
+            <td colspan="6" style="text-align: center;">No hay productos disponibles</td>
         </tr>
         </tbody>
+
+
     </table>
-</main>
+
+</div>
 
 <!-- Footer -->
-<footer style="padding: 20px; text-align: center; border-top: 1px solid #ccc; margin-top: 20px;">
-    <a th:href="@{/productos/new}" style="text-decoration: none; font-weight: bold;">Añadir Nuevo Producto</a>
+<footer>
+    <a th:href="@{/productos/new}">Añadir Nuevo Producto</a>
 </footer>
+
 </body>
 </html>
