@@ -1,70 +1,69 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${titulo}"></title>
-    <style rel="stylesheet">
-        header{
-            padding: 20px;
-            border-bottom: 1px solid gray;
-            position: relative;
-        }
-        header form, header div{
-            display: block;
-            position: absolute;
-            top: 40px;
-            right: 5px;
-
-        }
-        main{
-            padding: 20px;
-        }
-
-    </style>
+    <title th:text="${titulo}">Wallapod</title>
 </head>
-
 <body>
-    <header><h2>CATALOGO DE PRODUCTOS</h2>
-       <th:block sec:authorize="isAnonymous()">
-        <form th:action="@{/login}" method="post">
-            <span th:if="${param.errorLogin}">Usuario o contraseña no válidos.</span><br>
-                <input type="text" name="username" placeholder="Username"/>
-                <input type="password" name="password" placeholder="Password"/>
-            <input type="submit" value="Log in" />
-        </form>
-       </th:block>
-        <th:block sec:authorize="isAuthenticated()">
-            <div>Bienvenido <span sec:authentication="name"></span>
-            <a href="#" id="logoutEnlace" onclick="document.getElementById('formLogOut').submit()">Cerrar Sesión</a>
-            <form th:action="@{/logout}" method="post" id="formLogOut"></form> </div>
-        </th:block>
-    </header>
-    <main>
-    <select name="categoria" id="categoria" onchange="location.href = '/productos/categoria/'+this.value">
-        <option value="-1">Todas las categorias</option>
-        <option th:each="categoria : ${categorias}"
-                th:value="${categoria.id}"
-                th:text="${categoria.nombre}"
-                th:selected="${categoria.id == selectedCategoriaId}">
-        </option>
-
-    </select>
-
-    <div id="productos">
-        <p th:if="${#lists.isEmpty(productos)}">No hay productos.</p>
-        <ul>
-            <li th:each="producto: ${productos}">
-                <a th:href="@{'/productos/view/' + ${producto.id}}"
-                   th:text="${producto.titulo}"></a>
-                <span th:if="${producto.categoria != null}" th:text="'['+${producto.categoria.nombre}+']'"></span>
-                <a th:href="@{/productos/del/{id}(id=${producto.id})}">borrar</a>
-                <!--Queremos cargar una ruta del tipo: /getProductos/del/3 -->
-                <a th:href="@{/productos/edit/{id}(id=${producto.id})}">editar</a>
-            </li>
-        </ul>
+<!-- Navbar -->
+<nav>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f0f0f0; border-bottom: 1px solid #ccc;">
+        <div>
+            <a href="/" style="margin-right: 20px; text-decoration: none; font-weight: bold;">Wallapod</a>
+            <a href="/categorias" style="text-decoration: none;">Categorías</a>
+        </div>
+        <div>
+            <!-- Login/logout -->
+            <!--
+            <th:block sec:authorize="isAnonymous()">
+                <form th:action="@{/login}" method="post" style="display: inline;">
+                    <input type="text" name="username" placeholder="Username" />
+                    <input type="password" name="password" placeholder="Password" />
+                    <input type="submit" value="Log in" />
+                </form>
+            </th:block>
+            <th:block sec:authorize="isAuthenticated()">
+                <div style="display: inline;">
+                    Bienvenido <span sec:authentication="name"></span>
+                    <a href="#" id="logoutEnlace" onclick="document.getElementById('formLogOut').submit()">Cerrar Sesión</a>
+                    <form th:action="@{/logout}" method="post" id="formLogOut"></form>
+                </div>
+            </th:block>
+            -->
+        </div>
     </div>
-    <a th:href="@{/productos/new}">Insertar producto</a>
-    </main>
+</nav>
+
+<!-- Main Content -->
+<main style="padding: 20px;">
+    <h2>Catálogo de Productos</h2>
+    <table border="1" cellspacing="0" cellpadding="10" style="width: 100%; text-align: left;">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="producto : ${productos}">
+            <td th:text="${producto.titulo}">Nombre del producto</td>
+            <td th:text="${producto.categoria?.nombre ?: 'Sin Categoría'}">Categoría</td>
+            <td>
+                <a th:href="@{/productos/edit/{id}(id=${producto.id})}">Editar</a>
+                <a th:href="@{/productos/del/{id}(id=${producto.id})}" style="color: red;">Borrar</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(productos)}">
+            <td colspan="3" style="text-align: center;">No hay productos disponibles</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+<!-- Footer -->
+<footer style="padding: 20px; text-align: center; border-top: 1px solid #ccc; margin-top: 20px;">
+    <a th:href="@{/productos/new}" style="text-decoration: none; font-weight: bold;">Añadir Nuevo Producto</a>
+</footer>
 </body>
 </html>

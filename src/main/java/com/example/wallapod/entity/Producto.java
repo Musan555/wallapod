@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +32,14 @@ public class Producto {
     @NotEmpty(message = "La descripcion no puede estar en blanco")
     @Column(length = 2000)
     private String descripcion;
+
+    @ManyToOne(targetEntity = Categoria.class)
+    @JoinColumn(name = "id_categoria")
+    @NotNull (message ="Debes seleccionar una categoría")
+    private Categoria categoria;
+
+    @OneToMany(targetEntity = FotoProducto.class, cascade = CascadeType.ALL,
+            mappedBy = "producto")
+    private List<FotoProducto> fotos = new ArrayList<>();
+
 }

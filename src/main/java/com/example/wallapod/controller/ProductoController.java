@@ -30,6 +30,12 @@ public class ProductoController {
         this.fotoProductoService = fotoProductoService;
     }
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/productos"; // Redirige a la lista de productos
+    }
+
+
     @GetMapping("/productos")
     public String findAll(Model model) {
         model.addAttribute("productos", productoService.findAllProductos());
@@ -64,7 +70,6 @@ public class ProductoController {
         Optional<Producto> producto = productoService.findProductoById(id);
         if (producto.isPresent()) {
             model.addAttribute("producto", producto.get());
-            model.addAttribute("comentario", new Comentario());
             return "producto-view";
         }
         return "redirect:/productos";
