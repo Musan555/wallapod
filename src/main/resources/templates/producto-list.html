@@ -103,7 +103,6 @@
     </div>
 </nav>
 
-<!-- Main Content -->
 <div class="main-content">
     <h2>Catálogo de Productos</h2>
 
@@ -119,13 +118,22 @@
         </tr>
         </thead>
         <tbody>
+        <!-- Iterar sobre la lista de productos -->
         <tr th:each="producto : ${productos}">
             <td>
-                <!-- Verifica si hay fotos antes de intentar acceder a la primera -->
-                <img th:if="${not #lists.isEmpty(producto.fotos)}" th:src="@{${producto.fotos.get(0).url}}" alt="Imagen del producto" style="width: 100px; height: auto;">
-                <!-- Si no hay fotos, puedes mostrar una imagen por defecto o un texto -->
-                <img th:unless="${not #lists.isEmpty(producto.fotos)}" src="@{/images/no-image.jpg}" alt="Imagen por defecto" style="width: 100px; height: auto;">
+                <!-- Si el producto tiene fotos, mostrar la primera foto -->
+                <img th:if="${producto.fotos != null and not #lists.isEmpty(producto.fotos)}"
+                     th:src="@{'/imagesProductos/' + ${producto.fotos.get(0).nombre}}"
+                     alt="Imagen del producto"
+                     style="width: 100px; height: auto;">
+
+                <!-- Imagen por defecto cuando no hay fotos -->
+                <img th:unless="${producto.fotos != null and not #lists.isEmpty(producto.fotos)}"
+                     th:src="@{'/default.jpeg'}"
+                     alt="Imagen por defecto"
+                     style="width: 100px; height: auto;">
             </td>
+
             <td th:text="${producto.titulo}">Título del producto</td>
             <td th:text="${producto.descripcion}">Descripción del producto</td>
             <td th:text="${producto.precio}">Precio</td>
@@ -136,14 +144,12 @@
                 <a th:href="@{/productos/del/{id}(id=${producto.id})}" style="color: red;">Borrar</a>
             </td>
         </tr>
+        <!-- Si no hay productos, mostrar un mensaje -->
         <tr th:if="${#lists.isEmpty(productos)}">
             <td colspan="6" style="text-align: center;">No hay productos disponibles</td>
         </tr>
         </tbody>
-
-
     </table>
-
 </div>
 
 <!-- Footer -->
@@ -153,3 +159,4 @@
 
 </body>
 </html>
+

@@ -91,17 +91,20 @@ public class ProductoController {
             return "producto-new";
         }
 
-        //Guardar fotos
         try {
-            fotoProductoService.guardarFotos(fotos, producto);
-        }catch (IllegalArgumentException ex) {
+            // Guardar las fotos asociadas al producto
+            if (fotos != null && !fotos.isEmpty()) {
+                fotoProductoService.guardarFotos(fotos, producto); // Guardar fotos y asociarlas al producto
+            }
+        } catch (IllegalArgumentException ex) {
             model.addAttribute("categorias", productoService.findAllCategoriasSorted());
             model.addAttribute("mensaje", ex.getMessage());
             return "producto-new";
         }
 
-        //Guardar producto
+        // Guardar el producto en la base de datos
         productoService.saveProducto(producto);
+
         return "redirect:/productos";
     }
 
