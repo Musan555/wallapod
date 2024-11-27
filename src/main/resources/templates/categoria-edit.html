@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Categoría</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .form-label {
+      font-weight: bold;
+    }
+
+    .form-submit-btn {
+      margin-top: 20px;
+    }
+
+    .alert {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Editar Categoría</h2>
+
+  <!-- Si hay un mensaje de error, lo mostramos -->
+  <div th:if="${mensaje}" class="alert alert-danger">
+    <p th:text="${mensaje}"></p>
+  </div>
+
+  <div class="form-container">
+    <!-- Formulario para editar la categoría -->
+    <form th:action="@{/categoria/edit/{id}(id=${categoria.id})}" method="post" enctype="multipart/form-data">
+      <!-- Campo para nombre -->
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" class="form-control" th:value="${categoria.nombre}" required>
+      </div>
+
+      <!-- Campo para descripción -->
+      <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción:</label>
+        <textarea id="descripcion" name="descripcion" class="form-control" rows="3" required th:text="${categoria.descripcion}"></textarea>
+      </div>
+
+      <!-- Campo para subir foto (opcional) -->
+      <div class="mb-3">
+        <label for="file" class="form-label">Foto (opcional):</label>
+        <input type="file" name="file" id="file" class="form-control">
+      </div>
+
+      <!-- Botón de enviar -->
+      <div class="form-submit-btn">
+        <button type="submit" class="btn btn-primary">Actualizar Categoría</button>
+        <a th:href="@{/categorias}" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

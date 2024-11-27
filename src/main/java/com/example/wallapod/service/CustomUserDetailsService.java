@@ -7,19 +7,27 @@
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;
 //import org.springframework.security.core.userdetails.UsernameNotFoundException;
+//import org.springframework.stereotype.Service;
 //
+//@Service
 //public class CustomUserDetailsService implements UserDetailsService {
+//
+//    private final UsuarioRepository usuarioRepository;
+//
 //    @Autowired
-//    UsuarioRepository usuarioRepository;
+//    public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
+//        this.usuarioRepository = usuarioRepository;
+//    }
 //
 //    @Override
 //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //        Usuario usuario = usuarioRepository.findByEmail(username)
-//                .orElseThrow(() -> new UsernameNotFoundException("usuario no encontrado"));
-//        UserDetails user = User.builder()
-//                .username(usuario.getEmail())
+//                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+//        return User.withUsername(usuario.getEmail())
 //                .password(usuario.getPassword())
+//                .roles(usuario.getRol()) // Asignar el rol del usuario desde la base de datos
 //                .build();
-//        return user;
 //    }
 //}
+
+

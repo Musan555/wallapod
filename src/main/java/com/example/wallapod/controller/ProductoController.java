@@ -1,7 +1,9 @@
 package com.example.wallapod.controller;
 
 import com.example.wallapod.entity.Categoria;
+import com.example.wallapod.entity.FotoProducto;
 import com.example.wallapod.entity.Producto;
+import com.example.wallapod.repository.ProductoRepository; // Importa el repositorio
 import com.example.wallapod.service.FotoProductoService;
 import com.example.wallapod.service.ProductoService;
 import jakarta.validation.Valid;
@@ -9,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -23,11 +22,15 @@ public class ProductoController {
 
     private final ProductoService productoService;
     private final FotoProductoService fotoProductoService;
+    private final ProductoRepository productoRepository; // Declara el repositorio
 
     @Autowired
-    public ProductoController(ProductoService productoService, FotoProductoService fotoProductoService) {
+    public ProductoController(ProductoService productoService,
+                              FotoProductoService fotoProductoService,
+                              ProductoRepository productoRepository) {
         this.productoService = productoService;
         this.fotoProductoService = fotoProductoService;
+        this.productoRepository = productoRepository; // Inyecta el repositorio
     }
 
     @GetMapping("/")
@@ -35,24 +38,19 @@ public class ProductoController {
         return "redirect:/productos"; // Redirige a la lista de productos
     }
 
-
     @GetMapping("/productos")
     public String findAll(Model model) {
-        model.addAttribute("productos", productoService.findAllProductos());
+        model.addAttribute("productos", productoService.findAllProductosOrderByFechaCreacionDesc());
         model.addAttribute("categorias", productoService.findAllCategorias());
-        model.addAttribute("titulo", "Titulo de página");
         return "producto-list";
     }
 
     @GetMapping("/productos/categoria/{id}")
     public String findAllByCategoria(Model model, @PathVariable Long id) {
-        if (id.equals(-1L)) {
-            return "redirect:/productos";
-        }
         Optional<Categoria> categoriaSeleccionada = productoService.findCategoriaById(id);
         if (categoriaSeleccionada.isPresent()) {
             model.addAttribute("selectedCategoriaId", id);
-            model.addAttribute("productos", productoService.findProductosByCategoria(categoriaSeleccionada.get()));
+            model.addAttribute("productos", productoService.findProductosByCategoriaOrderByFechaCreacionDesc(categoriaSeleccionada.get()));
             model.addAttribute("categorias", productoService.findAllCategorias());
             return "producto-list";
         }
@@ -83,30 +81,23 @@ public class ProductoController {
     }
 
     @PostMapping("/productos/new")
-    public String newProductoInsert(Model model, @Valid Producto producto,
-                                    BindingResult bindingResult,
-                                    @RequestParam(value = "archivosFotos", required = false) List<MultipartFile> fotos) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categorias", productoService.findAllCategoriasSorted());
-            return "producto-new";
+    public String crearProducto(@ModelAttribute Producto producto,
+                                @RequestParam("archivosFotos[]") MultipartFile[] archivosFotos) {
+        // Guardar el producto primero
+        Producto productoGuardado = productoRepository.save(producto);
+
+        // Guardar las fotos y asociarlas al producto
+        if (archivosFotos != null && archivosFotos.length > 0) {
+            List<FotoProducto> fotos = fotoProductoService.guardarFotos(List.of(archivosFotos), productoGuardado);
+            productoGuardado.setFotos(fotos); // Asociar las fotos al producto
         }
 
-        try {
-            // Guardar las fotos asociadas al producto
-            if (fotos != null && !fotos.isEmpty()) {
-                fotoProductoService.guardarFotos(fotos, producto); // Guardar fotos y asociarlas al producto
-            }
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("categorias", productoService.findAllCategoriasSorted());
-            model.addAttribute("mensaje", ex.getMessage());
-            return "producto-new";
-        }
-
-        // Guardar el producto en la base de datos
-        productoService.saveProducto(producto);
+        // Guardar el producto con sus fotos
+        productoRepository.save(productoGuardado);
 
         return "redirect:/productos";
     }
+
 
     @GetMapping("/productos/edit/{id}")
     public String editProducto(@PathVariable Long id, Model model) {

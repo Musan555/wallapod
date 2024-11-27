@@ -92,12 +92,13 @@
         <div class="login-container">
             <!-- Mostrar opciones de login/logout basadas en autenticación -->
             <th:block sec:authorize="isAnonymous()">
-                <a href="/login">Iniciar sesión</a>
+                <a href="/login" class="btn btn-primary">Iniciar sesión</a>
+                <a href="/registro" class="btn btn-secondary">Registrarse</a>
             </th:block>
             <th:block sec:authorize="isAuthenticated()">
-                <span>Bienvenido, <span sec:authentication="name"></span></span>
-                <a href="#" id="logoutEnlace" onclick="document.getElementById('formLogOut').submit()">Cerrar sesión</a>
-                <form th:action="@{/logout}" method="post" id="formLogOut"></form>
+                <span><span sec:authentication="name"></span></span>
+                <a href="#" id="logoutEnlace" onclick="document.getElementById('formLogOut').submit()" class="btn btn-danger">Cerrar sesión</a>
+                <form th:action="@{/logout}" method="post" id="formLogOut" style="display:none;"></form>
             </th:block>
         </div>
     </div>

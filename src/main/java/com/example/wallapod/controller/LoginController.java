@@ -3,13 +3,12 @@ package com.example.wallapod.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
-
 @Controller
-class LoginController {
+public class LoginController {
 
+    // Mostrar el formulario de inicio de sesión
     @GetMapping("/login")
-    String login() {
-        return "redirect:/Usuario";
+    public String showLoginPage() {
+        return "login"; // Asegúrate de tener el archivo login.html
     }
 }

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Insertar nuevo producto</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"], select, input[type="file"] {
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .contenedorFotosProductosInsert {
+            display: flex;
+            gap: 10px;
+        }
+
+        .fotoProductoInsert {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .fotoProductoInsert img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .error-message {
+            color: red;
+            border: 1px solid red;
+            padding: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .fotoProductoInsert input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        select {
+            padding: 8px;
+            font-size: 14px;
+        }
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <h1>Insertar Nuevo Producto</h1>
+
+    <!-- Mostrar mensajes de error -->
+    <div th:if="${mensaje}" class="error-message">
+        <span th:text="${mensaje}"></span>
+    </div>
+
+    <!-- Formulario de producto -->
+    <form th:action="@{/productos/new}" method="POST" th:object="${producto}" enctype="multipart/form-data">
+
+        <!-- Título -->
+        <label for="titulo">Título del Producto:</label>
+        <input type="text" id="titulo" name="titulo" th:field="*{titulo}" placeholder="Título...">
+        <span th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></span>
+
+        <!-- Precio -->
+        <label for="precio">Precio:</label>
+        <input type="number" min="0" step="0.01" id="precio" name="precio" th:field="*{precio}" placeholder="Precio...">
+        <span th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></span>
+
+        <!-- Descripción (nuevo campo) -->
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion" th:field="*{descripcion}" placeholder="Descripción del producto..." rows="4" cols="50"></textarea>
+        <span th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></span>
+
+        <!-- Categoría -->
+        <label for="categoria">Categoría:</label>
+        <select id="categoria" name="categoria" th:field="*{categoria}">
+            <option value="">Selecciona una categoría</option>
+            <option th:each="categoria : ${categorias}" th:text="${categoria.nombre}" th:value="${categoria.id}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></span>
+
+        <!-- Campo de carga de imágenes -->
+        <label>Imágenes del Producto:</label>
+        <div class="contenedorFotosProductosInsert">
+            <div class="fotoProductoInsert">
+                <input type="file" name="archivosFotos[]" class="file-input" accept="image/jpeg, image/png, image/gif, image/webp" onchange="previewImage(this)" multiple>
+            </div>
+        </div>
+        <input type="submit" value="Insertar Producto">
+    </form>
+</div>
+
+<script>
+    // Abre el cuadro de selección de archivos del input correspondiente
+    function triggerFileInput(caja) {
+       caja.querySelector('.file-input').click();
+    }
+
+    // Previsualiza la imagen seleccionada dentro de la caja
+    function previewImage(input) {
+        const file = input.files[0];
+        const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+        if(file && !tiposPermitidos.includes(file.type)){
+            alert("Por favor, selecciona un archivo de imagen válido (JPEG, PNG, GIF o WEBP).");
+        }
+        else {
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    let img = input.parentElement.querySelector('img');
+                    // Si ya existe una imagen, la reutilizamos; si no, creamos una nueva
+                    if (!img) {
+                        img = document.createElement('img');
+                        input.parentElement.appendChild(img);
+                    }
+
+                    img.src = e.target.result; // Asigna la imagen como fondo de la caja
+                };
+
+                reader.readAsDataURL(file);
+            } else {    //No ha seleccionado archivo y hay foto la foto
+                let img = input.parentElement.querySelector('img');
+
+                if (img) {
+                    img.remove();
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

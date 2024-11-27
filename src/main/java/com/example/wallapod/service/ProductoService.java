@@ -24,35 +24,49 @@ public class ProductoService {
         this.categoriaRepository = categoriaRepository;
     }
 
+    // Obtener todos los productos ordenados por fecha de creación descendente
+    public List<Producto> findAllProductosOrderByFechaCreacionDesc() {
+        return productoRepository.findAll(Sort.by(Sort.Order.desc("fechaCreacion")));
+    }
+
+    // Obtener productos por categoría, ordenados por fecha de creación descendente
+    public List<Producto> findProductosByCategoriaOrderByFechaCreacionDesc(Categoria categoria) {
+        return productoRepository.findByCategoriaOrderByFechaCreacionDesc(categoria);
+    }
+
+    // Obtener todos los productos (sin ordenar)
     public List<Producto> findAllProductos() {
         return productoRepository.findAll();
     }
 
+    // Obtener todas las categorías
     public List<Categoria> findAllCategorias() {
         return categoriaRepository.findAll();
     }
 
+    // Obtener una categoría por ID
     public Optional<Categoria> findCategoriaById(Long id) {
         return categoriaRepository.findById(id);
     }
 
-    public List<Producto> findProductosByCategoria(Categoria categoria) {
-        return productoRepository.findByCategoria(categoria);
-    }
-
-    public void deleteProductoById(Long id) {
-        productoRepository.deleteById(id);
-    }
-
+    // Obtener un producto por su ID
     public Optional<Producto> findProductoById(Long id) {
         return productoRepository.findById(id);
     }
 
+    // Eliminar un producto por su ID
+    public void deleteProductoById(Long id) {
+        productoRepository.deleteById(id);
+    }
+
+    // Guardar un producto
     public void saveProducto(Producto producto) {
         productoRepository.save(producto);
     }
 
+    // Obtener todas las categorías ordenadas por nombre ascendente
     public List<Categoria> findAllCategoriasSorted() {
-        return categoriaRepository.findAll(Sort.by("nombre").ascending());
+        return categoriaRepository.findAll(Sort.by(Sort.Order.asc("nombre")));
     }
 }
+
